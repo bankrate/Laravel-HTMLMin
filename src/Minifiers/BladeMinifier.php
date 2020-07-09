@@ -52,6 +52,7 @@ class BladeMinifier implements MinifierInterface
     public function render($value)
     {
         if ($this->shouldMinify($value)) {
+            /* ORIGINAL
             $replace = [
                 '/<!--[^\[](.*?)[^\]]-->/s' => '',
                 "/<\?php/"                  => '<?php ',
@@ -61,7 +62,23 @@ class BladeMinifier implements MinifierInterface
                 "/\t/"                      => ' ',
                 '/ +/'                      => ' ',
             ];
-
+            */
+            
+            /* EXTRA FORK */
+            $replace = [
+                '/<!--[^\[](.*?)[^\]]-->/s' => '',
+                "/<\?php/"                  => '<?php ',
+                "/\n([\S])/"                => '$1',
+                "/>\n</"                    => '><',
+                "/>\s+\n</"                 => '><',
+                "/>\n\s+</"                 => '><',
+                "/\r/"                      => '',
+                "/\n/"                      => '',
+                "/\t/"                      => '',
+                "/ +/"                      => ' ',
+            ];
+            /* EXTRA FORK */
+            
             $value = preg_replace(array_keys($replace), array_values($replace), $value);
         } else {
             // Where skip minification tags are used let's remove them from markdown or blade.

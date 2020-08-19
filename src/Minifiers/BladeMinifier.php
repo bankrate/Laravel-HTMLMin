@@ -65,6 +65,7 @@ class BladeMinifier implements MinifierInterface
             */
             
             /* EXTRA FORK */
+            /*
             $replace = [
                 '/<!--[^\[](.*?)[^\]]-->/s' => '',
                 "/<\?php/"                  => '<?php ',
@@ -77,7 +78,56 @@ class BladeMinifier implements MinifierInterface
                 "/\t/"                      => '',
                 "/ +/"                      => ' ',
             ];
+            */
             /* EXTRA FORK */
+            
+            
+            /* EXTRA POWER */
+            $replace = [
+                // Remove JS comments
+                // https://stackoverflow.com/questions/55550890/remove-javascript-comments-using-regex-php
+                '#^\s*//.+$#m'              => '',
+                '/\/\*[\s\S]*?\*\/|([^:]|^)\/\/.*$/' => '',
+
+                // https://github.com/rjsworking/laravel-html-minify
+                '/^([\t ])+/m' => '',
+                '/([\t ])+$/m' => '',
+                '~//[a-zA-Z0-9 ]+$~m' => '',
+                '/[\r\n]+([\t ]?[\r\n]+)+/s' => '',
+                '/}[\r\n\t ]+/s' => '}',
+                '/}[\r\n\t ]+,[\r\n\t ]+/s' => '},',
+                '/\)[\r\n\t ]?{[\r\n\t ]+/s' => '){',
+                '/,[\r\n\t ]?{[\r\n\t ]+/s' => ',{',
+                '/\),[\r\n\t ]+/s' => '),',
+
+                // https://github.com/rjsworking/Laravel-HTMLMin
+                '/<!--[^\[](.*?)[^\]]-->/s' => '',
+                "/<\?php/"                  => '<?php ',
+                // "/\n([\S])/"                => '$1',
+                "/>\n</"                    => '><',
+                "/>\s+\n</"                 => '><',
+                "/>\n\s+</"                 => '><',
+                // "/\r/"                      => '',
+                // "/\n/"                      => '',
+                // "/\t/"                      => '',
+                // "/ +/"                      => ' ',
+
+                // From https://github.com/nckg/laravel-minify-html
+                // Remove HTML comments except IE conditions
+                '/(?s)<(pre|code|textarea)[^<]*>.*?<\\/(pre|code|textarea)>(*SKIP)(*F)|<!--(?!\s*(?:\[if [^\]]+]|<!|>))(?:(?!-->).)*-->/s' => '',
+                // Remove comments in the form /* */
+                '/(?s)<(pre|code|textarea)[^<]*>.*?<\\/(pre|code|textarea)>(*SKIP)(*F)|(?<!\S)\/\/\s*[^\r\n]*/' => '',
+                // Shorten multiple white spaces
+                '/(?s)<(pre|code|textarea)[^<]*>.*?<\\/(pre|code|textarea)>(*SKIP)(*F)|\s{2,}/' => ' ',
+                // Remove whitespaces between HTML tags
+                '/(?s)<(pre|textarea)[^<]*>.*?<\\/(pre|code|textarea)>(*SKIP)(*F)|>\s{2,}</' => '><',
+                // Collapse new lines
+                '/(?s)<(pre|code|textarea)[^<]*>.*?<\\/(pre|code|textarea)>(*SKIP)(*F)|(\r?\n)/' => '',
+            ];
+            
+            
+            
+            
             
             $value = preg_replace(array_keys($replace), array_values($replace), $value);
         } else {

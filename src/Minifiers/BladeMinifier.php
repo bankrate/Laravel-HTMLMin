@@ -69,7 +69,7 @@ class BladeMinifier implements MinifierInterface
             $replace = [
                 '/<!--[^\[](.*?)[^\]]-->/s' => '',
                 "/<\?php/"                  => '<?php ',
-                "/\n([\S])/"                => '$1',
+                "/\n([\S])/"                => ' $1',
                 "/>\n</"                    => '><',
                 "/>\s+\n</"                 => '><',
                 "/>\n\s+</"                 => '><',
@@ -113,7 +113,15 @@ class BladeMinifier implements MinifierInterface
                 // "/ +/"                      => ' ',
 
                 // From https://github.com/nckg/laravel-minify-html
+                // https://stackoverflow.com/questions/1013499/stripping-html-comments-with-php-but-leaving-conditionals
                 // Remove HTML comments except IE conditions
+
+                '/(?s)<(pre|code|textarea)[^<]*>.*?<\\/(pre|code|textarea)>(*SKIP)(*F)|<!--(?!\s*(?:\[if [^\]]+]|<!|>))(?:(?!-->).)*-->/s' => '',
+
+                // Remove HTML comments except IE, googleoff, googleon conditions
+                // https://stackoverflow.com/questions/28463265/remove-almost-all-html-comments-using-regex
+                '/<!--((?!googleoff|googleon)(?!\[endif\])[\s\S])*?-->/s' => '',
+           
                 '/(?s)<(pre|code|textarea)[^<]*>.*?<\\/(pre|code|textarea)>(*SKIP)(*F)|<!--(?!\s*(?:\[if [^\]]+]|<!|>))(?:(?!-->).)*-->/s' => '',
                 // Remove comments in the form /* */
                 '/(?s)<(pre|code|textarea)[^<]*>.*?<\\/(pre|code|textarea)>(*SKIP)(*F)|(?<!\S)\/\/\s*[^\r\n]*/' => '',
@@ -124,10 +132,6 @@ class BladeMinifier implements MinifierInterface
                 // Collapse new lines
                 '/(?s)<(pre|code|textarea)[^<]*>.*?<\\/(pre|code|textarea)>(*SKIP)(*F)|(\r?\n)/' => '',
             ];
-            
-            
-            
-            
             
             $value = preg_replace(array_keys($replace), array_values($replace), $value);
         } else {
